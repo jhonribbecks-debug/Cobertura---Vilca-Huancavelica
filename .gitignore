@@ -1,0 +1,25 @@
+# Entornos
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Datos temporales / de depuración
+*.log
+live*.json
+qt*.json
+live_lengths*.json
+
+# Archivos de proyecto (no deben subir al repo de herramienta)
+*.rvt
+*.dwg
+*.dxf
+*.bak
+*.s2k
+*.docx
+*.pdf
+*.xlsx
+*.ideaCon
+*.ideaCon.Archiv
+*.ideaCon.backup
+*.xmlR

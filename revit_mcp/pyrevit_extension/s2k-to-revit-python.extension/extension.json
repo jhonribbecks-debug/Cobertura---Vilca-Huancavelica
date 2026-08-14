@@ -1,0 +1,13 @@
+{
+    "builtin": "True",
+    "default_enabled": "False",
+    "type": "extension",
+    "rocket_mode_compatible": "True",
+    "name": "s2k-to-revit-python",
+    "description": "Importa modelos .s2k de SAP2000 a Revit y expone rutas MCP (status, familias, importacion). Usa el modulo Routes de pyRevit.",
+    "author": "Tenorious",
+    "url": "",
+    "website": "",
+    "image": "",
+    "dependencies": []
+}
