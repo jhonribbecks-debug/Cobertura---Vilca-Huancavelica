@@ -59,4 +59,4 @@ hardcodeados o extraerlos a variables de entorno.
 
 ## Repo
 
-GitHub: https://github.com/jhonribbecks-debug (repo pendiente de URL exacta).
+GitHub: https://github.com/jhonribbecks-debug/Cobertura---Vilca-Huancavelica
