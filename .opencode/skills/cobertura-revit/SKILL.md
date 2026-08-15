@@ -59,6 +59,19 @@ El `startup.py` auto-abre el `.rvt` definido en `TENORIOUS_PROJECT`
 (default: `COBERTURA HUANCALPI.rvt` en Tenorious). Verificar con `/status/`
 que `document_title` coincide antes de operar.
 
+## Pipeline de un disparo (herramienta MCP)
+
+El flujo completo (simetrizar + alinear extremos + correas + guardar) se
+orquesta desde el **servidor MCP externo** (`mcp_server.py`), no desde Revit:
+la herramienta `finish_arc_pipeline(dry_run, planes, skip_save)` llama
+secuencialmente a las rutas por HTTP. Usarla así en opencode:
+
+- `finish_arc_pipeline(dry_run=True)` → plan de los 3 pasos sin modificar.
+- `finish_arc_pipeline()` → ejecuta todo y guarda el documento.
+
+No usar auto-llamadas HTTP dentro de una ruta de Revit (el servidor de rutas
+es single-threaded y se bloquea).
+
 ## Rutas útiles en routes_arc.py
 
 | Ruta | Función |

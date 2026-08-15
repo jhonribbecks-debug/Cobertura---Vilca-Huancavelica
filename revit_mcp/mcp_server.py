@@ -249,6 +249,80 @@ async def import_s2k(
     return json.dumps(result, ensure_ascii=False, indent=2)
 
 
+@mcp.tool()
+async def finish_arc_pipeline(
+    dry_run: bool = False,
+    planes: str = "",
+    skip_save: bool = False,
+) -> str:
+    """Ejecuta de una sola llamada el flujo completo de finalizacion de la malla
+    del tijeral en Revit: simetrizar la malla en X=11.325, alinear los miembros
+    extremos radiales y apoyar las correas sobre la brida superior.
+
+    Orquesta las rutas de pyRevit secuencialmente (cada paso una llamada HTTP
+    al bridge localhost:48884). Si un paso falla se detiene y reporta.
+
+    Args:
+        dry_run: si True, solo muestra el plan de cada paso sin modificar.
+        planes: lista JSON opcional de planos Y a procesar, ej. "[0, 5.05]"
+                (vacío = todos los planos detectados).
+        skip_save: si True, no guarda el documento al final.
+    """
+    try:
+        import json as _json
+        parsed_planes = []
+        if planes:
+            try:
+                parsed_planes = _json.loads(planes)
+                if not isinstance(parsed_planes, list):
+                    parsed_planes = []
+            except Exception:
+                parsed_planes = []
+    except Exception:
+        parsed_planes = []
+
+    steps = [
+        ("symmetrize_web", {"dry_run": dry_run, "planes": parsed_planes}),
+        ("align_extreme_members", {"dry_run": dry_run}),
+        ("fix_correas_on_chord", {"dry_run": dry_run}),
+    ]
+    results = []
+    for name, payload in steps:
+        result = await _revit_call("POST", "/{}/".format(name), data=payload,
+                                   timeout=600.0)
+        if result.get("error"):
+            results.append({"step": name, "status": "error",
+                            "error": result.get("error")})
+            return json.dumps({
+                "status": "failed",
+                "failed_step": name,
+                "results": results,
+            }, ensure_ascii=False, indent=2)
+        summary = {k: result.get(k) for k in (
+            "moved", "created", "deleted", "total_purlins", "to_move",
+            "skipped", "errors", "plan", "dry_run") if k in result}
+        results.append({"step": name, "status": result.get("status"),
+                        "summary": summary})
+        if result.get("status") != "success":
+            return json.dumps({
+                "status": "failed",
+                "failed_step": name,
+                "results": results,
+            }, ensure_ascii=False, indent=2)
+
+    if not dry_run and not skip_save:
+        save = await _revit_call("POST", "/save_doc/", data={}, timeout=300.0)
+        results.append({"step": "save_doc", "status": save.get("status"),
+                        "path": save.get("path")})
+
+    return json.dumps({
+        "status": "success",
+        "dry_run": dry_run,
+        "steps": len(results),
+        "results": results,
+    }, ensure_ascii=False, indent=2)
+
+
 # --------------------------------------------------------------------------- #
 if __name__ == "__main__":
     transport = "stdio"

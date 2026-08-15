@@ -4,6 +4,9 @@ venv/
 __pycache__/
 *.pyc
 
+# Archivos movidos desde el proyecto (copia de archivo, no van al repo)
+desde_proyecto/
+
 # Datos temporales / de depuración
 *.log
 live*.json

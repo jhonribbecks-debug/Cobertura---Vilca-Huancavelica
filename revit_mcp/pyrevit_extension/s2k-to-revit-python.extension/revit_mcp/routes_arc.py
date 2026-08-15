@@ -74,6 +74,10 @@ def _is_member_web(el):
         return False
 
 
+def _pts_close(a, b, tol=0.15):
+    return math.hypot(a.X - b.X, a.Y - b.Y, a.Z - b.Z) <= tol * FT_PER_M
+
+
 def _is_arch(el):
     try:
         tn = _norm(get_element_name(el.Symbol))
@@ -6052,9 +6056,51 @@ def register_arc_routes(api):
             montant = doc.GetElement(DB.ElementId(long(m_id))) if m_id else None
             diag = doc.GetElement(DB.ElementId(long(d_id))) if d_id else None
             if montant is None or diag is None:
-                return routes.make_response(
-                    data={"error": "montant_id and diag_id required (valid)"},
-                    status=400)
+                # auto-deteccion: montante del extremo derecho del primer
+                # tijeral (Y=0): miembro web corto cuyo nudo inferior (menor Z)
+                # tiene la mayor X; la diagonal es el miembro web largo que
+                # comparte ese nudo inferior.
+                cand = []
+                for el in els:
+                    lc = el.Location
+                    curve = lc.Curve if hasattr(lc, "Curve") else None
+                    if curve is None or not isinstance(curve, DB.Line):
+                        continue
+                    if not _is_member_web(el):
+                        continue
+                    pa = curve.GetEndPoint(0)
+                    pb = curve.GetEndPoint(1)
+                    if abs((pa.Y + pb.Y) / 2.0 / FT - 0.0) > 0.05:
+                        continue
+                    length = math.hypot(
+                        (pa.X - pb.X) / FT, (pa.Z - pb.Z) / FT)
+                    cand.append((el, curve, pa, pb, length))
+                montant = None
+                m_curve = None
+                m_bot = None
+                for el, curve, pa, pb, length in cand:
+                    if length > 0.8:
+                        continue
+                    bot = pa if pa.Z < pb.Z else pb
+                    if montant is None or bot.X > m_bot.X:
+                        montant, m_curve, m_bot = el, curve, bot
+                diag = None
+                if montant is not None:
+                    for el, curve, pa, pb, length in cand:
+                        if el.Id == montant.Id:
+                            continue
+                        if length <= 0.8:
+                            continue
+                        if _pts_close(pa, m_bot) or _pts_close(pb, m_bot):
+                            diag = el
+                            break
+                if montant is None or diag is None:
+                    return routes.make_response(
+                        data={"error": "montante/diagonal del extremo no detectadas "
+                                      "(pase montant_id y diag_id)"},
+                        status=400)
+                m_id = element_id_value(montant.Id)
+                d_id = element_id_value(diag.Id)
 
             mcurve = montant.Location.Curve
             p = mcurve.GetEndPoint(0)
@@ -6414,114 +6460,4 @@ def register_arc_routes(api):
         except Exception as e:
             log_route_error("symmetrize_web", e)
             logger.error("symmetrize_web failed: %s", str(e))
-            return routes.make_response(data={"error": str(e)}, status=500)
-
-    @api.route("/finish_arc_pipeline/", methods=["POST"])
-    def finish_arc_pipeline(doc, request):
-        """Ejecuta de una sola llamada el flujo completo de finalizacion de la
-        malla del tijeral sobre el documento activo:
-
-          1. /symmetrize_web/     -> espeja la mitad derecha en X=11.325
-          2. /align_extreme_members/ -> alinea montante+diagonal de extremo
-          3. /fix_correas_on_chord/  -> correas HSS150x50x3 a R+0.125 sobre la brida
-          4. /save_doc/              -> guarda el documento
-
-        Cada paso se invoca contra el propio bridge HTTP
-        (http://127.0.0.1:48884/revit_mcp). Si un paso no responde success se
-        detiene y reporta el error sin ejecutar el resto.
-
-        Body: {"dry_run": true|false, "planes": [0, 5.05] | [] = todos}
-        """
-        try:
-            if not doc:
-                return routes.make_response(
-                    data={"error": "No active Revit document"}, status=503)
-            body = {}
-            if request and request.data:
-                try:
-                    body = json.loads(request.data) \
-                        if isinstance(request.data, str) else request.data
-                except Exception:
-                    body = {}
-            dry_run = bool(body.get("dry_run", False))
-            planes = body.get("planes") or []
-            bridge = "http://127.0.0.1:48884/revit_mcp"
-
-            def _http_post(route, payload, timeout=600):
-                import urllib2
-                req = urllib2.Request(
-                    bridge + route,
-                    data=json.dumps(payload).encode("utf-8"),
-                    headers={"Content-Type": "application/json"})
-                return json.loads(
-                    urllib2.urlopen(req, timeout=timeout).read().decode("utf-8"))
-
-            steps = [
-                ("symmetrize_web", {
-                    "dry_run": dry_run,
-                    "planes": planes,
-                }),
-                ("align_extreme_members", {
-                    "dry_run": dry_run,
-                }),
-                ("fix_correas_on_chord", {
-                    "dry_run": dry_run,
-                }),
-            ]
-            results = []
-            for name, payload in steps:
-                try:
-                    r = _http_post("/" + name + "/", payload)
-                    status = r.get("status")
-                    results.append({
-                        "step": name,
-                        "status": status,
-                        "summary": {k: r.get(k) for k in (
-                            "moved", "created", "deleted", "total_purlins",
-                            "to_move", "errors", "skipped") if k in r},
-                    })
-                    if status != "success":
-                        return routes.make_response(data={
-                            "status": "failed",
-                            "failed_step": name,
-                            "results": results,
-                            "error": r.get("error") or "step not success",
-                        }, status=500)
-                except Exception as e1:
-                    results.append({
-                        "step": name,
-                        "status": "error",
-                        "error": str(e1)[:300],
-                    })
-                    return routes.make_response(data={
-                        "status": "failed",
-                        "failed_step": name,
-                        "results": results,
-                        "error": str(e1)[:500],
-                    }, status=500)
-
-            if not dry_run:
-                try:
-                    r = _http_post("/save_doc/", {}, timeout=300)
-                    results.append({
-                        "step": "save_doc",
-                        "status": r.get("status"),
-                        "path": r.get("path"),
-                    })
-                except Exception as e1:
-                    results.append({
-                        "step": "save_doc",
-                        "status": "error",
-                        "error": str(e1)[:300],
-                    })
-
-            return routes.make_response(data={
-                "status": "success",
-                "dry_run": dry_run,
-                "steps": len(results),
-                "results": results,
-            })
-        except Exception as e:
-            log_route_error("finish_arc_pipeline", e)
-            logger.error("finish_arc_pipeline failed: %s", str(e))
             return routes.make_response(data={"error": str(e)}, status=500)
