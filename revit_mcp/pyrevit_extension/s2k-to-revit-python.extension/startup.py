@@ -41,9 +41,9 @@ _dbg("api created")
 # que no hace falta abrir el archivo manualmente tras cada reinicio.
 # La ruta es configurable por variable de entorno TENORIOUS_PROJECT.
 # ---------------------------------------------------------------------------
-AUTO_OPEN_PATH = os.environ.get(
-    "TENORIOUS_PROJECT",
-    r"C:\Users\aintc\OneDrive\Escritorio\Tenorious\COBERTURA HUANCALPI.rvt")
+AUTO_OPEN_PATH = os.environ.get("TENORIOUS_PROJECT", "")
+if not AUTO_OPEN_PATH or not os.path.exists(AUTO_OPEN_PATH):
+    AUTO_OPEN_PATH = ""
 AUTO_OPEN_BRIDGE = "http://127.0.0.1:48884/revit_mcp"
 _auto_started = [False]
 
@@ -69,6 +69,9 @@ def _auto_open_worker():
     if _auto_started[0]:
         return
     _auto_started[0] = True
+    if not AUTO_OPEN_PATH:
+        _dbg("auto-open: TENORIOUS_PROJECT no definido, saltando auto-open")
+        return
     expected = os.path.basename(AUTO_OPEN_PATH).lower()
     _dbg("auto-open worker started")
     time.sleep(8)

@@ -51,13 +51,15 @@ Revit para que el cambio tenga efecto. Usar el controlador del toolbox:
 
 ```powershell
 cd C:\Users\aintc\OneDrive\Escritorio\RIBBECK ENG\OPENCODE\Tenorious-Toolbox\revit_mcp
+$env:TENORIOUS_PROJECT = "D:\Proyectos\Huancalpi\COBERTURA HUANCALPI.rvt"   # si tu proyecto se movio
 python revitctl.py stop
 python revitctl.py start --timeout 240
 ```
 
 El `startup.py` auto-abre el `.rvt` definido en `TENORIOUS_PROJECT`
-(default: `COBERTURA HUANCALPI.rvt` en Tenorious). Verificar con `/status/`
-que `document_title` coincide antes de operar.
+(si no está definida, no abre nada). Verificar con `/status/`
+que `document_title` coincide antes de operar. Sin la variable, abrir el
+`.rvt` manualmente en Revit o pasar `--project` a `revitctl.py start`.
 
 ## Pipeline de un disparo (herramienta MCP)
 

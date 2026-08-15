@@ -59,7 +59,7 @@ Añadir la extensión y activar el servidor de Routes en
 
 ```ini
 [core]
-userextensions = ["C:\Users\aintc\OneDrive\Escritorio\Tenorious\revit_mcp\pyrevit_extension"]
+userextensions = ["C:\Users\aintc\OneDrive\Escritorio\RIBBECK ENG\OPENCODE\Tenorious-Toolbox\revit_mcp\pyrevit_extension"]
 
 [s2k-to-revit-python.extension]
 disabled = false
@@ -79,7 +79,8 @@ Reiniciar Revit. En la pestaña pyRevit debe aparecer la extensión
 
 ### 3. Registrar el MCP en opencode
 
-Ya existe `opencode.json` en la raíz del proyecto:
+Ya existe `opencode.json` en la raíz del proyecto (cópialo a tu carpeta de
+proyecto y ajusta las rutas del MCP a tu ubicación del toolbox):
 
 ```json
 {
@@ -88,8 +89,8 @@ Ya existe `opencode.json` en la raíz del proyecto:
     "revit": {
       "type": "local",
       "command": [
-        "C:/Users/aintc/OneDrive/Escritorio/Tenorious/revit_mcp/.venv/Scripts/python.exe",
-        "C:/Users/aintc/OneDrive/Escritorio/Tenorious/revit_mcp/mcp_server.py"
+        "C:/Users/aintc/OneDrive/Escritorio/RIBBECK ENG/OPENCODE/Tenorious-Toolbox/revit_mcp/.venv/Scripts/python.exe",
+        "C:/Users/aintc/OneDrive/Escritorio/RIBBECK ENG/OPENCODE/Tenorious-Toolbox/revit_mcp/mcp_server.py"
       ],
       "enabled": true
     }
@@ -113,7 +114,7 @@ Reiniciar opencode para que cargue la configuración.
 
    - `revit_status` → verificar que Revit responde (estado, doc, versiones).
    - `s2k_preview` → resumen del `.s2k` (**usar ruta absoluta**), p. ej.
-     `C:\Users\aintc\OneDrive\Escritorio\Tenorious\MN\HUANCALPI - MODELO FINAL v3.s2k`.
+     la que defina `TENORIOUS_S2K` o `<tu carpeta de proyecto>\MN\HUANCALPI - MODELO FINAL v3.s2k`.
    - `find_base_families` → confirma que encontró la familia HSS y la de
      barra redonda en la librería de contenido instalada.
    - `create_sections` → crea los tipos de sección en Revit (uno por

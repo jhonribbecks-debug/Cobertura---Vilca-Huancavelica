@@ -21,9 +21,7 @@ import httpx
 REVIT_EXE = os.environ.get(
     "TENORIOUS_REVIT_EXE",
     r"C:\Program Files\Autodesk\Revit 2027\Revit.exe")
-PROJECT = os.environ.get(
-    "TENORIOUS_PROJECT",
-    r"C:\Users\aintc\OneDrive\Escritorio\Tenorious\COBERTURA HUANCALPI.rvt")
+PROJECT = os.environ.get("TENORIOUS_PROJECT", "")
 BASE = "http://127.0.0.1:48884/revit_mcp"
 
 
@@ -47,8 +45,13 @@ def stop():
     return {"stopped": True, "was_running": True}
 
 
-def start(timeout=240):
-    subprocess.Popen([REVIT_EXE, PROJECT])
+def start(timeout=240, project=None):
+    project = project or PROJECT
+    if not project:
+        print("ERROR: no hay proyecto. Pasa --project <ruta.rvt> o "
+              "definelo en TENORIOUS_PROJECT.")
+        return {"healthy": False, "reason": "missing project path"}
+    subprocess.Popen([REVIT_EXE, project])
     deadline = time.time() + timeout
     while time.time() < deadline:
         try:
@@ -82,12 +85,14 @@ def main():
     ap.add_argument("--payload", nargs="?")
     ap.add_argument("--timeout", type=int, default=600)
     ap.add_argument("--start-timeout", type=int, default=240)
+    ap.add_argument("--project", nargs="?", default=None,
+                    help="Ruta del .rvt a abrir (default: TENORIOUS_PROJECT)")
     args = ap.parse_args()
 
     if args.cmd == "stop":
         print(json.dumps(stop()))
     elif args.cmd == "start":
-        print(json.dumps(start(args.start_timeout)))
+        print(json.dumps(start(args.start_timeout, project=args.project)))
     elif args.cmd == "status":
         code, text = status()
         print("HTTP", code)

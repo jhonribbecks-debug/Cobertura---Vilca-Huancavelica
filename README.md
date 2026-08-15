@@ -6,7 +6,8 @@ del tijeral + generación de memoria de cálculo.
 
 Este repositorio contiene **solo código y documentación** (no los archivos de
 proyecto). Los modelos `.rvt`, planos `.dwg`, `.s2k` y memorias viven en la
-carpeta del proyecto (`C:\Users\aintc\OneDrive\Escritorio\Tenorious`).
+carpeta del proyecto, que puede estar en **cualquier ubicación** (se configura
+por variable de entorno, ver abajo).
 
 ## Contenido
 
@@ -27,10 +28,21 @@ carpeta del proyecto (`C:\Users\aintc\OneDrive\Escritorio\Tenorious`).
 
 El toolbox es **genérico**. Solo se configura por variable de entorno:
 
-- `TENORIOUS_PROJECT`: ruta al modelo `.rvt` a abrir/operar
-  (default: `COBERTURA HUANCALPI.rvt`).
+- `TENORIOUS_PROJECT`: ruta al modelo `.rvt` a abrir/operar. **Obligatorio**
+  si quieres que `revitctl.py start` y el auto-open de Revit abran tu modelo
+  automáticamente.
+- `TENORIOUS_S2K`: ruta del `.s2k` a importar (default: busca `*.s2k` en
+  `Tenorious\MN` si aún existe; si no, pásalo con `make_payloads.py --s2k`).
 - `TENORIOUS_REVIT_EXE`: ruta del ejecutable de Revit
   (default: `C:\Program Files\Autodesk\Revit 2027\Revit.exe`).
+
+Ejemplo de uso del controlador con un proyecto movido:
+
+```powershell
+$env:TENORIOUS_PROJECT = "D:\Proyectos\Huancalpi\COBERTURA HUANCALPI.rvt"
+cd revit_mcp
+python revitctl.py start --timeout 240
+```
 
 pyRevit lee la extensión desde `%APPDATA%\pyRevit\pyRevit_config.ini`
 (`[core] userextensions`) apuntando a `...\Tenorious-Toolbox\revit_mcp\pyrevit_extension`.
@@ -48,8 +60,8 @@ python revitctl.py stop
 
 El flujo de finalización del tijeral (simetrizar malla, alinear extremos,
 correas sobre brida, guardar) está documentado en el skill
-`.opencode/skills/cobertura-revit/SKILL.md` y se puede ejecutar de una sola
-llamada con la ruta `/finish_arc_pipeline/`.
+`.opencode/skills/cobertura-revit/SKILL.md` y se ejecuta de una sola llamada
+con la herramienta MCP `finish_arc_pipeline`.
 
 ## Nota sobre los scripts del proyecto
 
