@@ -50,7 +50,7 @@ sesión pyRevit** (arranque de Revit). Si se edita una ruta, hay que reiniciar
 Revit para que el cambio tenga efecto. Usar el controlador del toolbox:
 
 ```powershell
-cd C:\Users\aintc\OneDrive\Escritorio\Tenorious-Toolbox\revit_mcp
+cd C:\Users\aintc\OneDrive\Escritorio\RIBBECK ENG\OPENCODE\Tenorious-Toolbox\revit_mcp
 python revitctl.py stop
 python revitctl.py start --timeout 240
 ```
