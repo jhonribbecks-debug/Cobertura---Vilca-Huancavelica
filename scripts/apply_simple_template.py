@@ -1,5 +1,8 @@
 import clr, os, sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from project_paths import out_dir  # noqa: E402
+
 idea_dir = r"C:\Program Files\IDEA StatiCa\StatiCa 20.1"
 sys.path.append(idea_dir)
 
@@ -12,8 +15,8 @@ import IdeaRS.OpenModel.Connection as iom_conn
 factory = plug.ConnHiddenClientFactory(idea_dir)
 client = factory.Create()
 
-project = r"C:\Users\aintc\AppData\Local\Temp\opencode\from_iom.ideaCon"
-template_path = r"C:\Users\aintc\AppData\Local\Temp\opencode\manual_template.xml"
+project = os.path.join(out_dir(), "from_iom.ideaCon")
+template_path = os.path.join(out_dir(), "manual_template.xml")
 
 try:
     print("=== OpenProject from_iom ===")

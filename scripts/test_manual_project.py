@@ -1,5 +1,8 @@
 import clr, os, sys, json
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from project_paths import project_file  # noqa: E402
+
 idea_dir = r"C:\Program Files\IDEA StatiCa\StatiCa 20.1"
 sys.path.append(idea_dir)
 
@@ -12,7 +15,7 @@ import IdeaRS.OpenModel.Connection as conn
 factory = plug.ConnHiddenClientFactory(idea_dir)
 client = factory.Create()
 
-project = r"C:\Users\aintc\OneDrive\Escritorio\Tenorious\Coneccion plancha base.ideaCon"
+project = project_file("Coneccion plancha base.ideaCon")
 
 try:
     print("=== OpenProject ===")

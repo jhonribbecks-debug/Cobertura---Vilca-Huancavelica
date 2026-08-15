@@ -1,5 +1,8 @@
 import clr, os, sys, json
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from project_paths import project_file, out_dir  # noqa: E402
+
 idea_dir = r"C:\Program Files\IDEA StatiCa\StatiCa 20.1"
 sys.path.append(idea_dir)
 
@@ -12,8 +15,8 @@ import IdeaRS.OpenModel.Connection as conn
 factory = plug.ConnHiddenClientFactory(idea_dir)
 client = factory.Create()
 
-project = r"C:\Users\aintc\OneDrive\Escritorio\Tenorious\Coneccion plancha base.ideaCon"
-template_path = r"C:\Users\aintc\AppData\Local\Temp\opencode\manual_template.xml"
+project = project_file("Coneccion plancha base.ideaCon")
+template_path = os.path.join(out_dir(), "manual_template.xml")
 
 try:
     print("=== OpenProject ===")
@@ -36,7 +39,7 @@ try:
     print("ApplyTemplate result:", result)
 
     # Save the modified project
-    output_path = r"C:\Users\aintc\AppData\Local\Temp\opencode\project_with_concrete.ideaCon"
+    output_path = os.path.join(out_dir(), "project_with_concrete.ideaCon")
     print("\n=== SaveAsProject ===")
     save_result = client.SaveAsProject(output_path)
     print("SaveAsProject result:", save_result)

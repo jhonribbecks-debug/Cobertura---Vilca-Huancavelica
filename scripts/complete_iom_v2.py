@@ -1,5 +1,8 @@
 import clr, os, sys, xml.etree.ElementTree as ET
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from project_paths import project_file  # noqa: E402
+
 idea_dir = r"C:\Program Files\IDEA StatiCa\StatiCa 20.1"
 sys.path.append(idea_dir)
 
@@ -181,7 +184,7 @@ it = CombiItem(); it.Id=1; it.Coeff=1.0; it.LoadCase = ReferenceElement(lc); ci.
 m.AddObject(ci)
 
 # Save IOM
-iom_path = r"C:\Users\aintc\OneDrive\Escritorio\Tenorious\col109_complete_iom.xml"
+iom_path = project_file("col109_complete_iom.xml")
 m.SaveToXmlFile(iom_path)
 print("IOM saved:", os.path.getsize(iom_path), "bytes")
 
@@ -233,14 +236,14 @@ ET.SubElement(srf, "Qz").text = str(Vz_kN)
 ET.SubElement(srf, "Mx").text = str(Mx_kNm)
 ET.SubElement(srf, "My").text = str(My_kNm)
 ET.SubElement(srf, "Mz").text = str(Mz_kNm)
-res_path = r"C:\Users\aintc\OneDrive\Escritorio\Tenorious\col109_results.xmlR"
+res_path = project_file("col109_results.xmlR")
 tree = ET.ElementTree(root)
 tree.write(res_path, encoding="utf-16", xml_declaration=True)
 print("Results saved:", os.path.getsize(res_path), "bytes")
 
 # CreateConProjFromIOM + Calculate
-out_path = r"C:\Users\aintc\OneDrive\Escritorio\Tenorious\col109_complete.ideaCon"
-empty_res = r"C:\Users\aintc\OneDrive\Escritorio\Tenorious\empty_res.xmlR"
+out_path = project_file("col109_complete.ideaCon")
+empty_res = project_file("empty_res.xmlR")
 with open(empty_res, "w", encoding="utf-16") as f:
     f.write('<?xml version="1.0" encoding="utf-16"?><OpenModelResult xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />')
 

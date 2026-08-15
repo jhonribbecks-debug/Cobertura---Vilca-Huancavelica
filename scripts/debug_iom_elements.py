@@ -1,5 +1,8 @@
 import clr, os, sys, json
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from project_paths import project_file, out_dir  # noqa: E402
+
 idea_dir = r"C:\Program Files\IDEA StatiCa\StatiCa 20.1"
 sys.path.append(idea_dir)
 
@@ -190,7 +193,7 @@ def build_and_test_iom(include_cuts=False, include_welds=False, include_bolts=Tr
     m.AddObject(ci)
 
     # Save
-    iom_path = f"C:\\Users\\aintc\\AppData\\Local\\Temp\\opencode\\test_iom_{name}.xml"
+    iom_path = os.path.join(out_dir(), "test_iom_{}.xml".format(name))
     m.SaveToXmlFile(iom_path)
     print(f"  IOM saved: {os.path.getsize(iom_path)} bytes")
 
@@ -198,8 +201,8 @@ def build_and_test_iom(include_cuts=False, include_welds=False, include_bolts=Tr
     factory = plug.ConnHiddenClientFactory(idea_dir_local)
     client = factory.Create()
     
-    out_path = f"C:\\Users\\aintc\\AppData\\Local\\Temp\\opencode\\test_{name}.ideaCon"
-    empty_res = r"C:\Users\aintc\OneDrive\Escritorio\Tenorious\empty_res.xmlR"
+    out_path = os.path.join(out_dir(), "test_{}.ideaCon".format(name))
+    empty_res = project_file("empty_res.xmlR")
     with open(empty_res, "w", encoding="utf-16") as f:
         f.write('<?xml version="1.0" encoding="utf-16"?><OpenModelResult xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />')
     

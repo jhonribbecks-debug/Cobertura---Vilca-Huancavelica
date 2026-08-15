@@ -1,5 +1,8 @@
 import os, sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from project_paths import out_dir  # noqa: E402
+
 idea_dir = r"C:\Program Files\IDEA StatiCa\StatiCa 20.1"
 sys.path.append(idea_dir)
 clr = None
@@ -10,7 +13,7 @@ import IdeaStatiCa.Plugin as plug
 from System.Collections.Generic import List as SList
 
 # Read the working IOM file
-iom_path = r"C:\Users\aintc\AppData\Local\Temp\opencode\col109_final_iom.xml"
+iom_path = os.path.join(out_dir(), "col109_final_iom.xml")
 content = open(iom_path, 'r', encoding='utf-16').read()
 
 # --- 1. Fix ConcreteBlockData - add all required properties ---
@@ -131,7 +134,7 @@ for bt_name, bt_id in [("Pedestal", "1"), ("Columna", "2")]:
             content = content[:bt_end] + conn_member + content[bt_end:]
 
 # Save
-new_iom_path = r"C:\Users\aintc\AppData\Local\Temp\opencode\col109_fixed_iom.xml"
+new_iom_path = os.path.join(out_dir(), "col109_fixed_iom.xml")
 with open(new_iom_path, 'w', encoding='utf-16') as f:
     f.write(content)
 
@@ -149,8 +152,8 @@ print("Has IsAnchor:", "IsAnchor>true" in content2)
 factory = plug.ConnHiddenClientFactory(idea_dir)
 client = factory.Create()
 
-results_path = r"C:\Users\aintc\AppData\Local\Temp\opencode\col109_results.xmlR"
-out_path = r"C:\Users\aintc\AppData\Local\Temp\opencode\col109_fixed_test.ideaCon"
+results_path = os.path.join(out_dir(), "col109_results.xmlR")
+out_path = os.path.join(out_dir(), "col109_fixed_test.ideaCon")
 
 # Create empty results file
 with open(results_path, "w", encoding="utf-16") as f:

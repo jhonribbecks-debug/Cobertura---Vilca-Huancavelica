@@ -1662,7 +1662,7 @@ def register_arc_routes(api):
         """Renderiza la vista 3D 'S2K 3D' (o la activa) a un PNG en disco.
 
         Usa View.ExportImage + ImageExportOptions. La imagen queda en
-        {out_dir}/{name}.png (defecto: C:\\Users\\aintc\\AppData\\Local\\Temp\\opencode\\revit_view.png).
+        {out_dir}/{name}.png (defecto: TENORIOUS_OUT o el TEMP del usuario).
         Body opcional:
           {"out_dir": "C:/...", "name": "vista", "pixels": 1600, "activate": true}
         """
@@ -1677,8 +1677,13 @@ def register_arc_routes(api):
                         if isinstance(request.data, str) else request.data
                 except Exception:
                     body = {}
-            out_dir = body.get("out_dir") or \
-                u"C:\\Users\\aintc\\AppData\\Local\\Temp\\opencode"
+            import os
+            _def_out = os.environ.get("TENORIOUS_OUT", "")
+            if not _def_out:
+                _def_out = os.path.join(
+                    os.environ.get("TEMP", os.environ.get("TMP", ".")),
+                    "opencode")
+            out_dir = body.get("out_dir") or _def_out
             name = body.get("name") or "revit_view"
             try:
                 pixels = int(body.get("pixels", 1600))
@@ -5460,7 +5465,7 @@ def register_arc_routes(api):
             created_corr = 0
             try:
                 import os
-                dbg = os.path.join(os.environ.get("TEMP", "C:/Users/aintc/AppData/Local/Temp"),
+                dbg = os.path.join(os.environ.get("TEMP", os.environ.get("TMP", ".")),
                                    "remall_plan_dbg.json")
                 lines = []
                 for pl in plans:
@@ -5531,7 +5536,7 @@ def register_arc_routes(api):
                                         "diag y=%s i=%s: %s" % (cy, i, str(e2)[:160]))
                 try:
                     with open(os.path.join(
-                        os.environ.get("TEMP", "C:/Users/aintc/AppData/Local/Temp"),
+                        os.environ.get("TEMP", os.environ.get("TMP", ".")),
                         "remall_created.json"), "w") as fh:
                         json.dump(created_log, fh)
                 except Exception:

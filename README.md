@@ -31,8 +31,9 @@ El toolbox es **genérico**. Solo se configura por variable de entorno:
 - `TENORIOUS_PROJECT`: ruta al modelo `.rvt` a abrir/operar. **Obligatorio**
   si quieres que `revitctl.py start` y el auto-open de Revit abran tu modelo
   automáticamente.
-- `TENORIOUS_S2K`: ruta del `.s2k` a importar (default: busca `*.s2k` en
-  `Tenorious\MN` si aún existe; si no, pásalo con `make_payloads.py --s2k`).
+- `TENORIOUS_S2K`: ruta del `.s2k` a importar (default: busca `*.s2k` en la
+  carpeta del proyecto o su subcarpeta `MN`; si no, pásalo con
+  `make_payloads.py --s2k`).
 - `TENORIOUS_REVIT_EXE`: ruta del ejecutable de Revit
   (default: `C:\Program Files\Autodesk\Revit 2027\Revit.exe`).
 

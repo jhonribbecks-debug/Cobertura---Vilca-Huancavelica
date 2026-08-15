@@ -227,7 +227,7 @@ def main() -> None:
     }
 
     # figura 3D desde Revit (exportada ya via bridge)
-    revit_3d = os.path.join(os.environ.get("TEMP", r"C:\Users\aintc\AppData\Local\Temp"),
+    revit_3d = os.path.join(os.environ.get("TEMP", os.environ.get("TMP", ".")),
                             "opencode", "revit_3D_vista.jpg")
     figuras_3d = {"modelo3d": revit_3d} if os.path.exists(revit_3d) else {}
     planos = [revit_3d] if os.path.exists(revit_3d) else None

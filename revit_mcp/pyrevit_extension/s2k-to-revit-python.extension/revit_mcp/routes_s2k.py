@@ -24,7 +24,11 @@ logger = logging.getLogger(__name__)
 FT_PER_M = 1.0 / 0.3048
 TOL = 0.05  # pies (~15 mm)
 
-PROG_LOG = r"C:\Users\aintc\AppData\Local\Temp\opencode\import_progress.log"
+PROG_LOG = os.path.join(
+    os.environ.get("TENORIOUS_OUT",
+                   os.path.join(os.environ.get("TEMP", os.environ.get("TMP", ".")),
+                                "opencode")),
+    "import_progress.log")
 
 # Nombres de familias que son montantes/mullion de muro cortina y que NO deben
 # usarse como respaldo para columnas estructurales (causa el dialogo

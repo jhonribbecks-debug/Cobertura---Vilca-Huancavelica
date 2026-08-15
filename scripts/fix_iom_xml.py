@@ -1,10 +1,13 @@
 import os, sys, xml.etree.ElementTree as ET
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from project_paths import out_dir  # noqa: E402
+
 idea_dir = r"C:\Program Files\IDEA StatiCa\StatiCa 20.1"
 sys.path.append(idea_dir)
 
 # Read the working IOM file
-iom_path = r"C:\Users\aintc\AppData\Local\Temp\opencode\col109_final_iom.xml"
+iom_path = os.path.join(out_dir(), "col109_final_iom.xml")
 content = open(iom_path, 'r', encoding='utf-16').read()
 
 # Find the ConcreteBlockData section
@@ -196,7 +199,7 @@ else:
     print("BoltAssembly already exists")
 
 # Save
-new_iom_path = r"C:\Users\aintc\AppData\Local\Temp\opencode\col109_fixed_iom.xml"
+new_iom_path = os.path.join(out_dir(), "col109_fixed_iom.xml")
 with open(new_iom_path, 'w', encoding='utf-16') as f:
     f.write(content)
 

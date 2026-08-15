@@ -8,13 +8,17 @@ registre en el paquete correcto) y luego se REUBICAN (move, no copy) junto
 al ancla correspondiente."""
 import os
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from project_paths import project_file, out_dir  # noqa: E402
+
 from docx import Document
 from docx.shared import Pt, Cm, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
-SRC = "/mnt/user-data/uploads/Tenorious/Memoria_de_Calculo_Estructural_Cobertura_Huancalpi.docx"
-OUT = "/tmp/Memoria_de_Calculo_Estructural_Cobertura_Huancalpi.docx"
-IMG_DIR = "/tmp"
+SRC = project_file("Memoria_de_Calculo_Estructural_Cobertura_Huancalpi.docx")
+OUT = os.path.join(out_dir(),
+                   "Memoria_de_Calculo_Estructural_Cobertura_Huancalpi.docx")
+IMG_DIR = out_dir()
 
 
 def _texto(doc, text):

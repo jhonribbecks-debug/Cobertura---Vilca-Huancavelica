@@ -1,5 +1,8 @@
 import clr, os, sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from project_paths import out_dir  # noqa: E402
+
 idea_dir = r"C:\Program Files\IDEA StatiCa\StatiCa 20.1"
 sys.path.append(idea_dir)
 
@@ -12,7 +15,7 @@ factory = plug.ConnHiddenClientFactory(idea_dir)
 client = factory.Create()
 
 # Use the originally created project (col109.ideaCon) which had working geometry
-project = r"C:\Users\aintc\AppData\Local\Temp\opencode\col109.ideaCon"
+project = os.path.join(out_dir(), "col109.ideaCon")
 
 try:
     print("=== OpenProject ===")

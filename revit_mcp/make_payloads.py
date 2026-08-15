@@ -16,20 +16,32 @@ def _default_s2k():
     env = os.environ.get("TENORIOUS_S2K", "")
     if env and os.path.exists(env):
         return env
-    for base in ("C:\\Users\\aintc\\OneDrive\\Escritorio\\Tenorious\\MN",
-                 os.path.expanduser("~") + "\\OneDrive\\Escritorio\\Tenorious\\MN"):
-        matches = sorted(glob.glob(os.path.join(base, "*.s2k")))
-        if matches:
-            return matches[0]
+    # si TENORIOUS_PROJECT/TENORIOUS_DIR apuntan a la carpeta del proyecto,
+    # buscar el .s2k dentro de su subcarpeta MN (o en la raiz).
+    proj = os.environ.get("TENORIOUS_PROJECT", "")
+    proj_dir = os.environ.get("TENORIOUS_DIR", "")
+    base = ""
+    if proj_dir and os.path.isdir(proj_dir):
+        base = proj_dir
+    elif proj and os.path.isfile(proj):
+        base = os.path.dirname(proj)
+    if base:
+        for sub in ("MN", ""):
+            cand = os.path.join(base, sub)
+            matches = sorted(glob.glob(os.path.join(cand, "*.s2k")))
+            if matches:
+                return matches[0]
     return ""
 
 
 def main():
     ap = argparse.ArgumentParser(description="Genera payloads JSON para Revit")
     ap.add_argument("--s2k", default=_default_s2k(),
-                    help="Ruta del .s2k (default: TENORIOUS_S2K o busca en Tenorious\\MN)")
+                    help="Ruta del .s2k (default: TENORIOUS_S2K o busca en la "
+                         "carpeta del proyecto/MN)")
     ap.add_argument("--out", default=os.environ.get(
-        "TENORIOUS_OUT", r"C:\Users\aintc\AppData\Local\Temp\opencode"),
+        "TENORIOUS_OUT",
+        os.path.join(os.environ.get("TEMP", os.environ.get("TMP", ".")), "opencode")),
         help="Carpeta de salida de los payloads")
     args = ap.parse_args()
 

@@ -13,7 +13,7 @@ import json
 import threading
 import traceback
 
-_DEBUG_LOG = os.path.join(os.environ.get("TEMP", r"C:\Users\aintc\AppData\Local\Temp"),
+_DEBUG_LOG = os.path.join(os.environ.get("TEMP", os.environ.get("TMP", ".")),
                           "opencode", "startup_debug.log")
 
 def _dbg(msg):

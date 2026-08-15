@@ -219,10 +219,13 @@ clr.AddReference(os.path.join(idea_dir, "IdeaRS.OpenModel.dll"))
 import IdeaRS.OpenModel as om
 import IdeaRS.OpenModel.Connection as conn
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from project_paths import project_file  # noqa: E402
+
 factory = plug.ConnHiddenClientFactory(idea_dir)
 client = factory.Create()
 
-project = r"C:\Users\aintc\OneDrive\Escritorio\Tenorious\Coneccion plancha base.ideaCon"
+project = project_file("Coneccion plancha base.ideaCon")
 
 try:
     print("\n=== OpenProject ===")
